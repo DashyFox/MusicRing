@@ -16,7 +16,10 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
 
 void shift(uint16_t, bool = true);
 
-uint8_t position = 1;
+volatile uint8_t position = 1;  // позиция сдвига
+volatile uint16_t frec = 42;    // частота MusicRing
+volatile uint16_t t_period_takts = F_CPU / 8 / LED_count / frec;
+
 void setup() {
     Serial.begin(115200);
 
@@ -89,11 +92,31 @@ void setup() {
         reset();
         delay(del);
     }
+
+    // инициализация Timer1
+    cli(); // отключить глобальные прерывания
+    TCCR1A = 0; // установить регистры в 0
+    TCCR1B = 0;
+
+    OCR1A = t_period_takts; // установка регистра совпадения
+    TCCR1B |= (1 << WGM12); // включение в CTC режим
+
+    // Установка битов CS на коэффициент деления 8
+    TCCR1B |= 0b00000010;
+
+    TIMSK1 |= (1 << OCIE1A);  // включение прерываний по совпадению
+    sei(); // включить глобальные прерывания
+}
+
+ISR(TIMER1_COMPA_vect) {
+    if (position >= LED_count) {
+        point_ini(1);
+        position = 1;
+    } else shift(1);
 }
 
 void loop() {
 
-    //105,23
     static uint32_t tmr;
     static uint8_t  arr [6] = { 0x3f>>1, 0xf0 ,0x7f>>3, 0xf8, 0x3f>>1, 0xf0 };
     static uint8_t arr2 [6]= { 0 };
@@ -105,14 +128,7 @@ void loop() {
         f = !f;
     }
 
-
-    if (position >= LED_count) {
-        point_ini(1);
-        position = 1;
-    }
-
-    else shift(1);
-    delayMicroseconds(1000000 / 42 / LED_count); // Если больше 2х перейти на micros
+    // delayMicroseconds(1000000 / 42 / LED_count); // Если больше 2х перейти на micros
 }
 
 void point_ini(uint8_t width) {
