@@ -47,8 +47,10 @@ public:
 
         for (uint16_t iY = 1; iY <= sizeY; iY++) {
             for (uint16_t iX = 1; iX <= sizeX; iX++) {
+
                 uint16_t local = iY * (sizeY - 1) + iX;
                 uint16_t global = screen.height * (posY + iY - 1) + (posX + iX);
+                
                 bool localPixel = (bitmap[local / 8] >> (7 - (local % 8))) & 1;
                 bool globalPixel = (screenBuffer[global / 8] >> (7 - (global % 8))) & 1;
 

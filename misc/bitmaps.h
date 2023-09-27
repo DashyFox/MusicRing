@@ -37,7 +37,7 @@ static const uint8_t DashyFox_logo [] PROGMEM = {
     /* 32 */ 0b11111111, 0b11100000, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000111, 0b11111111
 };
 
-static uint8_t DashyFox_logo_point_1 [] = {
+static uint8_t DashyFox_logo_point_1 [6] = {
      0x3f >> 1, 0xf0 ,0x7f >> 3, 0xf8, 0x3f >> 1, 0xf0 
 };
-static uint8_t DashyFox_logo_point_2 [] = {0};
+static uint8_t DashyFox_logo_point_2 [6] = {0};

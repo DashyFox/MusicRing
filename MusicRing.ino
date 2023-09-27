@@ -16,7 +16,7 @@ void setup() {
     ring.begin();
     screen.begin();
 
-    screen.drawBitmap(0, 0, DashyFox_logo, 128, 32);
+    screen.adafruit->drawBitmap(0, 0, DashyFox_logo, 128, 32, WHITE);
     screen.adafruit->display();
 
 }
