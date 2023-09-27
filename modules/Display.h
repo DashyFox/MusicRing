@@ -15,6 +15,15 @@ public:
         Ori_VERTICAL_FLIP = 270,
     };
 
+    template<uint16_t X, uint16_t Y>
+    struct Picture {
+        uint16_t sizeX = X;
+        uint16_t sizeY = Y;
+        uint8_t bitMap[(X * Y) / 8 + ((X * Y) / 8) ? 1 : 0];
+        uint8_t overMap[(X * Y) / 8 + ((X * Y) / 8) ? 1 : 0];
+    };
+
+
 protected:
     struct ScreenParam {
         uint16_t width, height, orientation;
@@ -31,5 +40,13 @@ public:
     }
 
     virtual void writePixel() {};
+
+    void drawBbitmap(int16_t x, int16_t y, const uint8_t bitmap [],
+        int16_t w, int16_t h) {
+
+        Picture<128, 32> logo;
+    }
+
+
 
 };
