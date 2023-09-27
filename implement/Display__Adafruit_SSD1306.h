@@ -16,8 +16,8 @@ public:
     }
 
 
-    void writePixel() override {
-
+    void writePixel(uint16_t x, uint16_t y, bool color) override {
+        adafruit->writePixel(x, y, color);
     }
 
     ~Display_Adafruit_SSD1306() {
