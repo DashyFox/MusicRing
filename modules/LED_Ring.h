@@ -3,15 +3,17 @@
 
 struct LED_Ring_PINOUT {
     uint8_t
-        Data,
-        CLK_inside,
-        CLK_outside,
-        RESET,
-        OutputEnable;
+        Data,           // yellow
+        CLK_inside,     // red
+        CLK_outside,    // orange
+        RESET,          // green
+        OutputEnable;   // pur
 };
 
 class LED_Ring {
 private:
+    HardwareTimer *MyTim = nullptr;
+
     LED_Ring_PINOUT pinOut;
     uint16_t ledCount;
     uint16_t updateFrec;
@@ -35,7 +37,7 @@ public:
 
     };
 
-    void begin() {
+    void begin(void(*func)(void)) {
 
         reset();
 
@@ -58,7 +60,7 @@ public:
             delay(del);
         }
 
-        timerIni(frec);
+        timerIni(frec, func);
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////
@@ -96,7 +98,7 @@ public:
     //////////////////////////////////////////////////////////////////////////////
 
     void isr() {
-        if (position >= ledCount) {
+        if (position > ledCount) {
             point_ini(1);
             position = 1;
         } else shift(1);
@@ -104,36 +106,47 @@ public:
 
     //////////////////////////////////////////////////////////////////////////////
 
-    void timerIni(uint16_t _frec) { //TODO: Сделать возможность выбора таймеров
-        period = F_CPU / 8 / ledCount / _frec;
-        // инициализация Timer1
-        cli(); // отключить глобальные прерывания
-        TCCR1A = 0; // установить регистры в 0
-        TCCR1B = 0;
+void timerIni(uint16_t _frec, void(*func)(void)) {
+    // Определяем таймер, например, используем TIM2
+    MyTim = new HardwareTimer(TIM2);
 
-        OCR1A = period; // установка регистра совпадения
-        TCCR1B |= (1 << WGM12); // включение в CTC режим
+    // Рассчитываем период
+    uint32_t prescaler = 8; // Делитель
+    period = (SystemCoreClock / (prescaler * _frec)) - 1;
 
-        // Установка битов CS на коэффициент деления 8
-        TCCR1B |= 0b00000010;
+    // Останавливаем таймер перед настройкой
+    MyTim->pause();
 
-        TIMSK1 |= (1 << OCIE1A);  // включение прерываний по совпадению
-        sei(); // включить глобальные прерывания
-    }
-
-    void setFrec(uint8_t frec) {
-        period = F_CPU / 8 / ledCount / frec;
-        cli();
-        OCR1A = period; // установка регистра совпадения
-        sei();
-    }
+    // Настраиваем предделитель (делитель частоты)
+    MyTim->setPrescaleFactor(prescaler);
     
-    void setPeriod(uint8_t per) {
-        period = per;
-        cli();
-        OCR1A = period; // установка регистра совпадения
-        sei();
-    }
+    // Настраиваем таймер в режиме CTC (count-to-clear)
+    MyTim->setOverflow(period);
+    MyTim->attachInterrupt(func);
+    MyTim->resume();
+}
+
+void setFrec(uint16_t frec) {
+    uint32_t prescaler = 8; // Делитель
+    period = (SystemCoreClock / (prescaler * frec)) - 1;
+
+    // Останавливаем таймер перед изменением периода
+    MyTim->pause();
+    MyTim->setOverflow(period);
+    MyTim->refresh(); // Обновление настроек таймера
+    MyTim->resume();
+}
+
+void setPeriod(uint32_t per) {
+    period = per;
+
+    // Останавливаем таймер перед изменением периода
+    MyTim->pause();
+    MyTim->setOverflow(period);
+    MyTim->refresh(); // Обновление настроек таймера
+    MyTim->resume();
+}
+
 
     /////////////////////////////////////////////////////////////////
 };

@@ -1,5 +1,6 @@
 {
     "port": "COM3",
-    "board": "arduino:avr:uno",
-    "sketch": "MusicRing.ino"
+    "board": "STMicroelectronics:stm32:GenF4",
+    "sketch": "MusicRing.ino",
+    "configuration": "pnum=BLACKPILL_F411CE,upload_method=swdMethod,xserial=generic,usb=CDCgen,xusb=FS,opt=osstd,dbg=none,rtlib=nano"
 }
