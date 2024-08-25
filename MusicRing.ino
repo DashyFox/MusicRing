@@ -1,14 +1,14 @@
-#include <Arduino.h>
+#include "Arduino.h"
 //#include <avr/iom328.h>
 
-#include "modules/LED_Ring.h"
-#include "implement/Display__Adafruit_SSD1306.h"
-#include "misc/bitmaps.h"
+#include "./modules/LED_Ring.h"
+#include "./implement/Display__Adafruit_SSD1306.h"
+#include "./misc/bitmaps.h"
 
 LED_Ring_PINOUT pinout { 5, 6, 7, 8, 9 };
 
 LED_Ring ring(32, pinout);
-Display_Adafruit_SSD1306 screen(128, 32, Display::Ori_HORIZONTAL);
+Screen screen(128, 32, Display::Ori_HORIZONTAL);
 
 void setup() {
     Serial.begin(115200);
